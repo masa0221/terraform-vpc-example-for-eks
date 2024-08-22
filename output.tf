@@ -38,3 +38,13 @@ output "gateways" {
   }
 }
 
+output "security-groups" {
+  value = {
+    cluster_shared_node : {
+      id : aws_security_group.cluster_shared_node.id
+    },
+    rds : {
+      id : aws_security_group.rds.id
+    },
+  }
+}
