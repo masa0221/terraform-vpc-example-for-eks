@@ -90,7 +90,7 @@ resource "aws_internet_gateway" "public" {
 }
 
 resource "aws_nat_gateway" "private" {
-  allocation_id     = aws_eip.for_nat.id
+  allocation_id     = aws_eip.natip.id
   connectivity_type = "public"
   subnet_id         = aws_subnet.public[keys(var.private_subnet_cidr_blocks)[0]].id
 
@@ -99,7 +99,7 @@ resource "aws_nat_gateway" "private" {
   }
 }
 
-resource "aws_eip" "for_nat" {
+resource "aws_eip" "natip" {
   domain = "vpc"
 
   tags = {
