@@ -29,12 +29,12 @@ output "gateways" {
     igw : {
       id : aws_internet_gateway.public.id,
     },
-    # nat : {
-    #   id : aws_nat_gateway.private.id,
-    #   allocation_id : aws_nat_gateway.private.allocation_id,
-    #   eip : aws_eip.for_nat.public_ip,
-    #   subnet_id : aws_nat_gateway.private.subnet_id,
-    # }
+    nat : {
+      id : aws_nat_gateway.private.id,
+      allocation_id : aws_nat_gateway.private.allocation_id,
+      eip : aws_eip.natip.public_ip,
+      subnet_id : aws_nat_gateway.private.subnet_id,
+    }
   }
 }
 
