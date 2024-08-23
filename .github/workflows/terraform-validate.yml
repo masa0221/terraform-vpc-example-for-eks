@@ -18,8 +18,14 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Set up Terraform
-      uses: hashicorp/setup-terraform@v3
+    - name: Set up asdf and install Terraform
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y curl git
+        git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.11.3
+        . ~/.asdf/asdf.sh
+        asdf plugin-add terraform || true
+        asdf install
 
     - name: Terraform Init
       run: terraform init
