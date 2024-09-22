@@ -1,20 +1,25 @@
 variable "resource_name_prefix" {
-  type = string
+  description = "A variable to specify the prefix for resource names"
+  type        = string
 }
 
 variable "region" {
-  type = string
+  description = "The AWS region where the resources will be created"
+  type        = string
 }
 
 variable "vpc_cidr_block" {
-  type = string
+  description = "The CIDR block for the VPC"
+  type        = string
 }
 
 variable "public_subnet_cidr_blocks" {
-  type = map(string)
+  description = "A map of CIDR blocks for the public subnets"
+  type        = map(string)
 }
 
 variable "private_subnet_cidr_blocks" {
-  type = map(string)
+  description = "A map of CIDR blocks for the private subnets"
+  type        = map(string)
 }
 
