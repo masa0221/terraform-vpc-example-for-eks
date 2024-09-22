@@ -17,11 +17,10 @@ output "route_tables" {
   }
 }
 
-output "gateways_public" {
-  value = module.vpc.gateways
-}
-
-output "gateways_private" {
-  value = module.nat_gateway.gateways
+output "gateways" {
+  value = {
+    igw : module.vpc.gateways.igw,
+    nat : module.nat_gateway.gateways.nat
+  }
 }
 

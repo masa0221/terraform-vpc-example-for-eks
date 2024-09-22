@@ -1,3 +1,7 @@
+variable "resource_name_prefix" {
+  type = string
+}
+
 variable "vpc_id" {
   description = "The ID of the VPC where the NAT gateway will be created"
   type        = string
@@ -8,15 +12,11 @@ variable "public_subnet_id" {
   type        = string
 }
 
-variable "resource_name_prefix" {
-  type = string
-}
-
-variable "private_subnet_cidr_blocks" {
+variable "private_subnet" {
   type = map(string)
 }
 
-variable "private_subnet" {
+variable "private_subnet_cidr_blocks" {
   type = map(string)
 }
 
