@@ -1,5 +1,5 @@
 resource "aws_security_group" "cluster_shared_node" {
-  name        = "${local.resouce_name_prefix}ClusterSharedNode"
+  name        = "${var.resource_name_prefix}ClusterSharedNode"
   description = "Communication between all nodes in the cluster"
 
   vpc_id = aws_vpc.main.id
@@ -20,12 +20,12 @@ resource "aws_security_group" "cluster_shared_node" {
   }
 
   tags = {
-    Name = "${local.resouce_name_prefix}WorkerNode"
+    Name = "${var.resource_name_prefix}WorkerNode"
   }
 }
 
 resource "aws_security_group" "rds" {
-  name        = "${local.resouce_name_prefix}/Rds"
+  name        = "${var.resource_name_prefix}/Rds"
   description = "Allow worker node traffic"
 
   vpc_id = aws_vpc.main.id
@@ -46,7 +46,7 @@ resource "aws_security_group" "rds" {
   }
 
   tags = {
-    Name = "${local.resouce_name_prefix}Rds"
+    Name = "${var.resource_name_prefix}Rds"
   }
 }
 
