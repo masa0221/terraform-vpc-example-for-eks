@@ -41,3 +41,9 @@ variable "private_subnet_cidr_blocks" {
   }
 }
 
+variable "rds_cluster_identifier" {
+  description = "The RDS cluster identifier. If not set, var.project_name will be used as the default."
+  type        = string
+  default     = ""
+}
+

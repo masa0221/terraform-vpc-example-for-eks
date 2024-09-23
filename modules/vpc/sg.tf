@@ -25,7 +25,7 @@ resource "aws_security_group" "cluster_shared_node" {
 }
 
 resource "aws_security_group" "rds" {
-  name        = "${var.resource_name_prefix}/Rds"
+  name        = "${var.resource_name_prefix}Rds"
   description = "Allow worker node traffic"
 
   vpc_id = aws_vpc.main.id

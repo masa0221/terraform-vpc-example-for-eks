@@ -46,3 +46,14 @@ module "nat_gateway" {
   private_subnet_cidr_blocks = var.private_subnet_cidr_blocks
 }
 
+module "rds" {
+  source = "./modules/rds"
+
+  cluster_identifier   = var.rds_cluster_identifier != "" ? var.rds_cluster_identifier : var.project_name
+  resource_name_prefix = local.resouce_name_prefix
+
+  region             = var.region
+  private_subnet_ids = [for subnet in module.vpc.subnet.private : subnet]
+  security_group_ids = [module.vpc.security_groups.rds.id]
+}
+

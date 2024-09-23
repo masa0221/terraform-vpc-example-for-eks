@@ -24,3 +24,10 @@ output "gateways" {
   }
 }
 
+
+output "rds" {
+  value = {
+    cluster_identifier : module.rds.cluster_identifier
+    endpoint : module.rds.endpoint
+  }
+}
