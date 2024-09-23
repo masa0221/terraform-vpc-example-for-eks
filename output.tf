@@ -1,50 +1,33 @@
 output "vpc_id" {
-  value = aws_vpc.main.id
+  value = module.vpc.vpc_id
 }
 
 output "subnet" {
-  value = {
-    public : { for k, v in aws_subnet.public : k => v.id },
-    private : { for k, v in aws_subnet.private : k => v.id }
-  }
+  value = module.vpc.subnet
+}
+
+output "security_groups" {
+  value = module.vpc.security_groups
 }
 
 output "route_tables" {
   value = {
-    public : {
-      id : aws_route_table.public.id
-      # route : aws_route_table.public.route
-    },
-    private : {
-      for k, v in aws_route_table.private : k => {
-        id : v.id,
-        # route : v.route
-      }
-    }
+    public : module.vpc.route_tables.public,
+    private : module.nat_gateway.route_tables.private
   }
 }
 
 output "gateways" {
   value = {
-    igw : {
-      id : aws_internet_gateway.public.id,
-    },
-    nat : {
-      id : aws_nat_gateway.private.id,
-      allocation_id : aws_nat_gateway.private.allocation_id,
-      eip : aws_eip.natip.public_ip,
-      subnet_id : aws_nat_gateway.private.subnet_id,
-    }
+    igw : module.vpc.gateways.igw,
+    nat : module.nat_gateway.gateways.nat
   }
 }
 
-output "security-groups" {
+
+output "rds" {
   value = {
-    cluster_shared_node : {
-      id : aws_security_group.cluster_shared_node.id
-    },
-    rds : {
-      id : aws_security_group.rds.id
-    },
+    cluster_identifier : module.rds.cluster_identifier
+    endpoint : module.rds.endpoint
   }
 }

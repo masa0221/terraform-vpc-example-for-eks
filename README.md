@@ -169,6 +169,28 @@ nodeGroups:
     desiredCapacity: 2
 ```
 
+## 料金をなるべく押さえるために
+有料リソースはなるべく停止しておきたいという方のためにモジュール単位で作成・削除できるようにしました。  
+以下を参考にリソースの停止・再作成してください。
+
+### 無料のリソースだけを作成
+作成しても無料な VPC / Subnet / Route Table / Internet Gateway / Security Group のみを作成します
+
+```sh
+terraform apply -target=module.vpc
+```
+
+### 有料のリソースだけを削除、再作成
+NAT Gateway 関連と RDS 関連のリソースのみを削除します。
+```sh
+terraform destroy -target=module.nat_gateway -target=module.rds
+```
+
+再度作成する場合は以下を実行してください。
+```sh
+terraform apply -target=module.nat_gateway -target=module.rds
+```
+
 ## LICENSE
 MIT
 
