@@ -31,7 +31,7 @@ resource "aws_rds_cluster" "aurora_cluster" {
 
 resource "aws_rds_cluster_instance" "aurora_instance" {
   identifier         = "${var.cluster_identifier}-instance"
-  cluster_identifier = var.cluster_identifier
+  cluster_identifier = aws_rds_cluster.aurora_cluster.cluster_identifier
 
   engine = local.engine
 

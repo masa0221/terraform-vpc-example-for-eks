@@ -7,6 +7,8 @@ output "endpoint" {
 }
 
 output "security_group" {
-  value = aws_security_group.rds.id
+  value = {
+    id : aws_security_group.rds.id
+  }
 }
 
