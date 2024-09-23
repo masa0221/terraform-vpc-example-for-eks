@@ -7,8 +7,14 @@ output "subnet" {
 }
 
 output "security_groups" {
-  value = module.vpc.security_groups
+  value = merge(
+    module.vpc.security_groups,
+    {
+      rds : module.rds.security_group,
+    }
+  )
 }
+
 
 output "route_tables" {
   value = {
