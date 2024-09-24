@@ -52,8 +52,9 @@ module "rds" {
   cluster_identifier   = var.rds_cluster_identifier != "" ? var.rds_cluster_identifier : var.project_name
   resource_name_prefix = local.resouce_name_prefix
 
-  region             = var.region
-  private_subnet_ids = [for subnet in module.vpc.subnet.private : subnet]
-  security_group_ids = [module.vpc.security_groups.rds.id]
+  region                     = var.region
+  vpc_id                     = module.vpc.vpc_id
+  private_subnet_ids         = [for subnet in module.vpc.subnet.private : subnet]
+  inbound_security_group_ids = [module.vpc.security_groups.cluster_shared_node.id]
 }
 

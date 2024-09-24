@@ -1,8 +1,29 @@
 # EKS 練習用の VPC & 関連リソース 作成
-このTerraformプロジェクトは、EKSクラスターを作成する際に使用するVPCおよび関連リソースをあらかじめ作成するためのものです。学習用に設計されていますので、EKS環境を試す際にご利用ください。
+このTerraformプロジェクトは、EKSクラスター用のVPCや関連リソースを事前に作成するためのものです。  
+学習目的で設計されており、実運用向けの設定は含まれていません。
 
 
 ## 作成されるもの
+以下の リソース が作成されます。
+
+- ネットワーク関係
+  - VPC
+  - Subnet(public/private)
+  - Route Table
+  - Internet Gateway
+  - NAT Gateway
+  - SecurityGroup(sg)
+    - Kubernetes の Node に設定するための sg
+      - Node 同士の通信を許可
+    - Kubernetes の Node から RDS(3306) を許可するための sg
+      - Node --> RDS を許可する（RDS設定用）
+- データベース関係
+  - RDS Cluster & Instance (1台)
+  - Subnet Group
+  - Secret Manager (admin Password 保管用)
+
+
+### ネットワーク関係詳細
 ![リソースマップ](./docs/resource-map.png)
 
 | 名前                          | サブネットのタイプ     | AZ                | CIDRブロック      | IPアドレス範囲                | IPアドレス数 |
@@ -12,24 +33,25 @@
 | example-for-eks/PublicSubnet-c | パブリックサブネット   | ap-northeast-1c   | 172.20.32.0/19    | 172.20.32.0 - 172.20.63.255   | 8,192        |
 | example-for-eks/PrivateSubnet-c | プライベートサブネット | ap-northeast-1c   | 172.20.128.0/19   | 172.20.128.0 - 172.20.159.255 | 8,192        |
 
-上記に加えて、以下の SecurityGroup(sg) が作成されます。
-
-- Kubernetes の Node に設定するための sg
-  - Node 同士の通信を許可
-- Kubernetes の Node から RDS(3306) を許可するための sg
-  - Node --> RDS を許可する（RDS設定用）
-
 
 ### AWS の料金
-ここで作成されるほとんどのリソースは作成するだけでは料金が発生しませんが、NAT Gateway 作成すると時間単位で料金が発生します。  
-1日に 1.488 USD (= 0.062 USD * 24 h) 発生するので気をつけてください。 (*1)
+作成されるAWSリソースのうち以下のリソースには起動している時間の分だけ料金が発生します。
 
-他にも通信量によって課金されるリソースもあります。詳しくは以下を確認してください。
+- NAT Gateway
+  - 0.062 USD / hour (*1)
+- RDS
+  - 0.125 USD / hour (*1)
+- Secret Manager
+  - シークレットひとつあたり USD 0.40 / month (*2)
 
-[料金 - Amazon VPC | AWS](https://aws.amazon.com/jp/vpc/pricing/)
+他にも通信量によって課金されます。詳しくは以下を確認してください。
 
+- [料金 - Amazon VPC | AWS](https://aws.amazon.com/jp/vpc/pricing/)
+- [料金 \- AWS Secrets Manager \| AWS](https://aws.amazon.com/jp/secrets-manager/pricing/)
+- [料金 \- Amazon RDS \| AWS](https://aws.amazon.com/jp/rds/pricing/)
 
-*1) アジアパシフィック（東京）で計算しています(2024/08/23現在)
+*1) アジアパシフィック（東京）で計算しています(2024/08/23現在)  
+*2) SecretManager は1ヶ月未満の場合時間単位で課金されるので仮に1週間(168時間)放置しても 0.09 USD です
 
 
 ## 初期設定
@@ -102,41 +124,51 @@ Outputs:
 
 gateways = {
   "igw" = {
-    "id" = "igw-0e09fb45dedc3a126"
+    "id" = "igw-09c79ae99561ce92e"
   }
+  "nat" = {
+    "allocation_id" = "eipalloc-06a9fd703bd3b37e8"
+    "eip" = "18.180.39.18"
+    "id" = "nat-095d381e2aacfdbce"
+    "subnet_id" = "subnet-0530108ae4bf7e25f"
+  }
+}
+rds = {
+  "cluster_identifier" = "example-for-eks"
+  "endpoint" = "example-for-eks.cluster-abcdefghij12.ap-northeast-1.rds.amazonaws.com"
 }
 route_tables = {
   "private" = {
     "a" = {
-      "id" = "rtb-04a2e0e6dd6a92168"
+      "id" = "rtb-01277811b441483cc"
     }
     "c" = {
-      "id" = "rtb-0fe08107a9c3be6eb"
+      "id" = "rtb-03fd1963090584902"
     }
   }
   "public" = {
-    "id" = "rtb-0da58dc98663f4479"
+    "id" = "rtb-0b7c6c1b7d74ed6c1"
   }
 }
-security-groups = {
+security_groups = {
   "cluster_shared_node" = {
-    "id" = "sg-0a6dacbdfae209ac8"
+    "id" = "sg-01f7fb5c490e1e321"
   }
   "rds" = {
-    "id" = "sg-04c97c6449e64fbba"
+    "id" = "sg-0cb0a347fdd4b4dcd"
   }
 }
 subnet = {
   "private" = {
-    "a" = "subnet-0de55cf0df0ae4295"
-    "c" = "subnet-0786d5b3b458d920f"
+    "a" = "subnet-0afed2d9ca0618292"
+    "c" = "subnet-048785d9bddde51fc"
   }
   "public" = {
-    "a" = "subnet-0bb7ae5ee942c10b9"
-    "c" = "subnet-0090d67194167d356"
+    "a" = "subnet-0530108ae4bf7e25f"
+    "c" = "subnet-0306db4cc0c51eef8"
   }
 }
-vpc_id = "vpc-083a8213a651eea17"
+vpc_id = "vpc-05e06efc4522bd55e"
 ```
 
 
@@ -145,22 +177,22 @@ vpc_id = "vpc-083a8213a651eea17"
 apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 metadata:
-  name: eks-example
+  name: webapp
   region: ap-northeast-1
   version: "1.30"
 vpc:
   subnets:
     private:
       ap-northeast-a:
-        id: subnet-0de55cf0df0ae4295
+        id: subnet-0afed2d9ca0618292
       ap-northeast-c:
-        id: subnet-0786d5b3b458d920f
+        id: subnet-048785d9bddde51fc
     public:
-      ap-northeast-a: 
-        id: subnet-0bb7ae5ee942c10b9
+      ap-northeast-a:
+        id: subnet-0530108ae4bf7e25f
       ap-northeast-c:
-        id: subnet-0090d67194167d356
-  sharedNodeSecurityGroup: sg-0a6dacbdfae209ac8
+        id: subnet-0306db4cc0c51eef8
+  sharedNodeSecurityGroup: sg-01f7fb5c490e1e321
 nodeGroups:
   - name: workers
     instanceType: t3.medium
@@ -171,25 +203,51 @@ nodeGroups:
 
 ## 料金をなるべく押さえるために
 有料リソースはなるべく停止しておきたいという方のためにモジュール単位で作成・削除できるようにしました。  
-以下を参考にリソースの停止・再作成してください。
+以下の手順のように行うとコストを最低限にしつつ学習を進められます。
 
-### 無料のリソースだけを作成
-作成しても無料な VPC / Subnet / Route Table / Internet Gateway / Security Group のみを作成します
+### 1. 全てのリソースを作成
+最初は全てのリソースを作成します。
 
 ```sh
-terraform apply -target=module.vpc
+terraform apply
 ```
+全てのリソースを作成するのに大体8分ほどかかります。
 
-### 有料のリソースだけを削除、再作成
-NAT Gateway 関連と RDS 関連のリソースのみを削除します。
+### 2. 有料のリソースだけを削除
+NAT Gateway と RDS は起動している間料金が発生するので、削除します。
+
+※ DB の内容も全て削除します。
+
 ```sh
 terraform destroy -target=module.nat_gateway -target=module.rds
 ```
+RDS の削除は15分ほどかかります。
 
-再度作成する場合は以下を実行してください。
+
+### 3. 有料のリソースを起動
+2 で削除したリソースを再度作成します。
+
 ```sh
 terraform apply -target=module.nat_gateway -target=module.rds
 ```
+再作成したので、DB の内容はまっさらな状態です。改めて `CREATE DATABASE` や `CREATE TABLE` を行ってください。
+
+
+### RDS を使わない場合
+RDS が不要な場合は、以下のようにすると VPC や NAT Gateway などネットワーク関連のリソースのみ作成できます。
+
+```sh
+terraform apply -target=module.vpc -target=module.nat_gateway
+```
+
+
+## 免責事項
+このTerraformプロジェクトおよび関連資料は学習目的で提供されており、使用に際しての正確性、信頼性、適用性についていかなる保証も行いません。本プロジェクトを使用することで発生した問題や損害については、一切の責任を負いかねますのでご了承ください。
+
+また、AWS等のクラウドサービスを利用する場合、その利用に伴う料金が発生する可能性があり、これに関連する費用はユーザーの責任で管理してください。必ず最新の料金体系や使用量を確認し、不要なリソースは速やかに削除するなどの適切な管理を行ってください。
+
+最後に、このリポジトリ内のコードやドキュメントを使用する前に、必ず自身の環境に適した内容であるか確認し、必要に応じて調整を行ってください。
+
 
 ## LICENSE
 MIT

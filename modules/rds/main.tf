@@ -11,7 +11,7 @@ resource "aws_rds_cluster" "aurora_cluster" {
   master_username             = "admin"
   manage_master_user_password = true
 
-  vpc_security_group_ids = var.security_group_ids
+  vpc_security_group_ids = [aws_security_group.rds.id]
 
   db_subnet_group_name = aws_db_subnet_group.private.name
 
@@ -31,7 +31,7 @@ resource "aws_rds_cluster" "aurora_cluster" {
 
 resource "aws_rds_cluster_instance" "aurora_instance" {
   identifier         = "${var.cluster_identifier}-instance"
-  cluster_identifier = var.cluster_identifier
+  cluster_identifier = aws_rds_cluster.aurora_cluster.cluster_identifier
 
   engine = local.engine
 
