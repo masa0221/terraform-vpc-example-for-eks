@@ -250,5 +250,5 @@ terraform apply -target=module.vpc -target=module.nat_gateway
 
 
 ## LICENSE
-MIT
+Apache License 2.0
 
