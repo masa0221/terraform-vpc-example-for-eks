@@ -49,7 +49,7 @@
 - [料金 \- AWS Secrets Manager \| AWS](https://aws.amazon.com/jp/secrets-manager/pricing/)
 - [料金 \- Amazon RDS \| AWS](https://aws.amazon.com/jp/rds/pricing/)
 
-*1) アジアパシフィック（東京）で計算しています(2024/08/23現在)
+*1) アジアパシフィック（東京）で計算しています(2024/08/23現在)  
 *2) SecretManager は1ヶ月未満の場合時間単位で課金されるので仮に1週間(168時間)放置しても 0.09 USD です
 
 
