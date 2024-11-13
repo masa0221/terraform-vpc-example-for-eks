@@ -13,14 +13,16 @@
   - Internet Gateway
   - NAT Gateway
   - SecurityGroup(sg)
-    - Kubernetes の Node に設定するための sg
-      - Node 同士の通信を許可
-    - Kubernetes の Node から RDS(3306) を許可するための sg
-      - Node --> RDS を許可する（RDS設定用）
+    - EKS Node に設定するための sg
+      - 外部の sg に設定する識別子として利用
+    - RDS に設定するための sg
+      - Node --> RDS を許可する
 - データベース関係
-  - RDS Cluster & Instance (1台)
-  - Subnet Group
-  - Secret Manager (admin Password 保管用)
+  - RDS
+    - RDS Cluster & Instance (1台)
+    - Subnet Group
+  - Secret Manager
+    - MySQL admin パスワード保管用
 
 
 ### ネットワーク関係詳細
@@ -151,7 +153,7 @@ route_tables = {
   }
 }
 security_groups = {
-  "cluster_shared_node" = {
+  "worker_node" = {
     "id" = "sg-01f7fb5c490e1e321"
   }
   "rds" = {
@@ -181,6 +183,7 @@ metadata:
   region: ap-northeast-1
   version: "1.30"
 vpc:
+  id: vpc-05e06efc4522bd55e
   subnets:
     private:
       ap-northeast-a:
@@ -192,13 +195,14 @@ vpc:
         id: subnet-0530108ae4bf7e25f
       ap-northeast-c:
         id: subnet-0306db4cc0c51eef8
-  sharedNodeSecurityGroup: sg-01f7fb5c490e1e321
-nodeGroups:
+managedNodeGroups:
   - name: workers
     instanceType: t3.medium
-    minSize: 2
-    maxSize: 2
     desiredCapacity: 2
+    minSize: 2
+    maxSize: 5
+    securityGroups:
+      attachIDs: ["sg-01f7fb5c490e1e321"]
 ```
 
 ## 料金をなるべく押さえるために

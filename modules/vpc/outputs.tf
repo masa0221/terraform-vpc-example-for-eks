@@ -28,8 +28,8 @@ output "gateways" {
 
 output "security_groups" {
   value = {
-    cluster_shared_node : {
-      id : aws_security_group.cluster_shared_node.id
+    worker_node : {
+      id : aws_security_group.worker_node.id
     }
   }
 }
